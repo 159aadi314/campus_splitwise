@@ -1,35 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:campus_splitwise/src/search.dart';
-
-final List genfriends = List.generate(20, (index) {
-  return {
-    'id': '$index',
-    'name': 'Friend ${index + 1}',
-    'IOU': index % 3 == 1
-        ? 100
-        : index % 3 == 2
-            ? -100
-            : 0, // pos or neg
-  };
-});
-final Map<String, dynamic> myfriends = {
-  'friends': genfriends,
-};
 
 class FriendsPage extends StatefulWidget {
+  const FriendsPage({Key? key}) : super(key: key);
+
   @override
-  FriendsPageState createState() => FriendsPageState();
+  _FriendsPageState createState() => _FriendsPageState();
 }
+class _FriendsPageState extends State<FriendsPage> {
+  final List<Map<String,dynamic>> _allfriends = List.generate(20, (index) {
+    return {
+      'id': '$index',
+      'name': 'Friend ${index + 1}',
+      'IOU': index % 3 == 1
+          ? 100
+          : index % 3 == 2
+              ? -100
+              : 0, // pos or neg
+    };
+  });
 
-class FriendsPageState extends State<FriendsPage> {
-  late Map<String, dynamic> friends;
-  String query = '';
-
+  List<Map<String, dynamic>> _foundUsers = [];
   @override
-  void initState() {
+  initState() {
+    // at the beginning, all users are shown
+    _foundUsers = _allfriends;
     super.initState();
+  }
 
-    friends = myfriends;
+  // This function is called whenever the text field changes
+  void _runFilter(String enteredKeyword) {
+    List<Map<String, dynamic>> results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = _allfriends;
+    } else {
+      results = _allfriends
+          .where((user) =>
+              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+      // we use the toLowerCase() method to make it case-insensitive
+    }
+
+    // Refresh the UI
+    setState(() {
+      _foundUsers = results;
+    });
   }
 
   // This widget is the root of your application.
@@ -45,22 +60,34 @@ class FriendsPageState extends State<FriendsPage> {
         ),
       ),
 
-      body: Column(children: <Widget>[
-        buildSearch(),
-        Expanded(
-          child: ListView.builder(
-            itemCount: friends['friends'].length,
-            itemBuilder: (context, index) {
-              final item = friends['friends'][index];
-              return Card(
-                elevation: 2,
-                margin: EdgeInsets.all(8),
-                child:buildBook(item))
-                ;
-            },
-          ),
-        )
-      ]),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: 
+        Column(
+          children: [
+            TextField(
+              onChanged: (value) => _runFilter(value),
+              decoration: const InputDecoration(
+                  labelText: 'Search', suffixIcon: Icon(Icons.search)),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: _foundUsers.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _foundUsers.length,
+                      itemBuilder: (context, index) => 
+                        buildBox(_foundUsers[index]),
+                    )
+                  : const Text(
+                      'No results found',
+                      style: TextStyle(fontSize: 24),
+                    ),
+            ),
+          ],
+        ),
+      ),
 
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -90,34 +117,51 @@ class FriendsPageState extends State<FriendsPage> {
     );
   }
 
-  Widget buildSearch() => SearchWidget(
-        text: query,
-        hintText: 'Search friends',
-        onChanged: searchBook,
-      );
-
-  Widget buildBook(dynamic book) => ListTile(
-        leading: const Icon(Icons.person),
-        title: Text(book['name']),
-        trailing: Text(
-          book['IOU'] == 0
-              ? 'settled'
-              : book['IOU'] > 0
-                  ? 'owes you ${book['IOU']}'
-                  : 'you get back ${-book['IOU']}',
+  Widget buildBox(Map<String,dynamic> friend) => Card(
+        key: ValueKey(friend["id"]),
+        elevation: 2,
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        child: ListTile(
+          leading: const Icon(Icons.person),
+          title: Text(friend['name']),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Text(
+                friend['IOU'] == 0
+                    ? 'settled'
+                    : friend['IOU'] > 0
+                        ? 'owes you'
+                        : 'you owe',
+                style: TextStyle(
+                  color: friend['IOU'] == 0
+                      ? Colors.grey
+                      : friend['IOU'] > 0
+                          ? Color.fromARGB(255, 112, 237, 116)
+                          : Color.fromARGB(255, 255, 107, 97),
+                ),
+              ),
+              Text(
+                friend['IOU'] == 0
+                    ? ''
+                    : friend['IOU'] > 0
+                        ? ' ${friend['IOU']}'
+                        : ' ${-friend['IOU']}',
+                style: TextStyle(
+                  // make the text bold and big
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: friend['IOU'] == 0
+                      ? Colors.black
+                      : friend['IOU'] > 0
+                          ? Color.fromARGB(255, 112, 237, 116)
+                          : Color.fromARGB(255, 255, 107, 97),
+                ),
+              )
+            ],
+          ),
         ),
       );
 
-  void searchBook(String query) {
-    final books = myfriends['friends'].where((book) {
-      final titleLower = book['name'].toLowerCase();
-      final searchLower = query.toLowerCase();
-      return titleLower.contains(searchLower);
-    }).toList();
-
-    setState(() {
-      this.query = query;
-      this.friends['friends'] = books;
-    });
-  }
 }
