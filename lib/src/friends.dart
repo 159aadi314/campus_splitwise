@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:adding_expense_2/src/adding_expenses.dart';
 class FriendsPage extends StatefulWidget {
   const FriendsPage({Key? key}) : super(key: key);
 
@@ -14,8 +14,8 @@ class _FriendsPageState extends State<FriendsPage> {
       'IOU': index % 3 == 1
           ? 100
           : index % 3 == 2
-              ? -100
-              : 0, // pos or neg
+          ? -100
+          : 0, // pos or neg
     };
   });
 
@@ -36,7 +36,7 @@ class _FriendsPageState extends State<FriendsPage> {
     } else {
       results = _allfriends
           .where((user) =>
-              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -62,7 +62,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: 
+        child:
         Column(
           children: [
             TextField(
@@ -76,14 +76,14 @@ class _FriendsPageState extends State<FriendsPage> {
             Expanded(
               child: _foundUsers.isNotEmpty
                   ? ListView.builder(
-                      itemCount: _foundUsers.length,
-                      itemBuilder: (context, index) => 
-                        buildBox(_foundUsers[index]),
-                    )
+                itemCount: _foundUsers.length,
+                itemBuilder: (context, index) =>
+                    buildBox(_foundUsers[index]),
+              )
                   : const Text(
-                      'No results found',
-                      style: TextStyle(fontSize: 24),
-                    ),
+                'No results found',
+                style: TextStyle(fontSize: 24),
+              ),
             ),
           ],
         ),
@@ -118,50 +118,56 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   Widget buildBox(Map<String,dynamic> friend) => Card(
-        key: ValueKey(friend["id"]),
-        elevation: 2,
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        child: ListTile(
-          leading: const Icon(Icons.person),
-          title: Text(friend['name']),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                friend['IOU'] == 0
-                    ? 'settled'
-                    : friend['IOU'] > 0
-                        ? 'owes you'
-                        : 'you owe',
-                style: TextStyle(
-                  color: friend['IOU'] == 0
-                      ? Colors.grey
-                      : friend['IOU'] > 0
-                          ? Color.fromARGB(255, 112, 237, 116)
-                          : Color.fromARGB(255, 255, 107, 97),
-                ),
-              ),
-              Text(
-                friend['IOU'] == 0
-                    ? ''
-                    : friend['IOU'] > 0
-                        ? ' ${friend['IOU']}'
-                        : ' ${-friend['IOU']}',
-                style: TextStyle(
-                  // make the text bold and big
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: friend['IOU'] == 0
-                      ? Colors.black
-                      : friend['IOU'] > 0
-                          ? Color.fromARGB(255, 112, 237, 116)
-                          : Color.fromARGB(255, 255, 107, 97),
-                ),
-              )
-            ],
+    key: ValueKey(friend["id"]),
+    elevation: 2,
+    margin: const EdgeInsets.symmetric(vertical: 10),
+    child: ListTile(
+      leading: const Icon(Icons.person),
+      title: Text(friend['name']),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyApp(name: friend['name'])),
+        );
+      },
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            friend['IOU'] == 0
+                ? 'settled'
+                : friend['IOU'] > 0
+                ? 'owes you'
+                : 'you owe',
+            style: TextStyle(
+              color: friend['IOU'] == 0
+                  ? Colors.grey
+                  : friend['IOU'] > 0
+                  ? Color.fromARGB(255, 112, 237, 116)
+                  : Color.fromARGB(255, 255, 107, 97),
+            ),
           ),
-        ),
-      );
+          Text(
+            friend['IOU'] == 0
+                ? ''
+                : friend['IOU'] > 0
+                ? ' ${friend['IOU']}'
+                : ' ${-friend['IOU']}',
+            style: TextStyle(
+              // make the text bold and big
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: friend['IOU'] == 0
+                  ? Colors.black
+                  : friend['IOU'] > 0
+                  ? Color.fromARGB(255, 112, 237, 116)
+                  : Color.fromARGB(255, 255, 107, 97),
+            ),
+          )
+        ],
+      ),
+    ),
+  );
 
 }
