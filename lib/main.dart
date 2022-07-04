@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:adding_expense_2/src/friends.dart';
+import 'package:campus_splitwise/src/friends.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark
       ),
       home: FriendsPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
