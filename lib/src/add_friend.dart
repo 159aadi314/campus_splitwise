@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:email_validator/email_validator.dart';
 class AddFriend extends StatefulWidget {
   const AddFriend({Key? key}) : super(key: key);
 
@@ -20,78 +20,76 @@ class _AddFriendState extends State<AddFriend> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'add-friend',
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Add a friend'),
-        ),
-        body: ListView(
-          children: <Widget>[
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 15, 40, 20),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        flex: 1,
-                        child:  Icon(
-                          Icons.email_rounded,
-                          size: 24.0,
-                          semanticLabel:
-                              'Description icon',
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add a friend'),
+      ),
+      body: ListView(
+        children: <Widget>[
+        Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 40, 20),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      flex: 1,
+                      child:  Icon(
+                        Icons.email_rounded,
+                        size: 24.0,
+                        semanticLabel:
+                            'Description icon',
                       ),
-                      Expanded(
-                        flex: 6,
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'enter email ...',
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.greenAccent,
-                              ),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'enter email ...',
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.greenAccent,
                             ),
                           ),
-                          autofocus: true,
                         ),
+                        autofocus: true,
+                        validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Container(
-            margin: EdgeInsets.all( 40),
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.check, color: Colors.black),
-              // shift 10 unit left
-              label: Text('Confirm', style: TextStyle(color: Colors.black)),
-              // style: ElevatedButton.styleFrom(
-              //   Color: MaterialStateProperty.all<Color>(Colors.greenAccent),
-              // ),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
-                }
-                if (_formKey.currentState!.validate()) {
-                  // _formKey.currentState!.save();
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          )
-          ] 
         ),
+        Container(
+          margin: EdgeInsets.all( 40),
+          child: ElevatedButton.icon(
+            icon: Icon(Icons.check, color: Colors.black),
+            // shift 10 unit left
+            label: Text('Confirm', style: TextStyle(color: Colors.black)),
+            // style: ElevatedButton.styleFrom(
+            //   Color: MaterialStateProperty.all<Color>(Colors.greenAccent),
+            // ),
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                // If the form is valid, display a snackbar. In the real world,
+                // you'd often call a server or save the information in a database.
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Processing Data')),
+                );
+              }
+              if (_formKey.currentState!.validate()) {
+                // _formKey.currentState!.save();
+                Navigator.pop(context);
+              }
+            },
+          ),
+        )
+        ]
       ),
     );
   }
