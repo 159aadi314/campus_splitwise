@@ -60,7 +60,7 @@ class _AddExpenseState extends State<AddExpense> {
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
                   child:
                   Row(children: [
-                    Text('Paid by ', style: TextStyle( fontSize: 20)),
+                    Text('Paid to ', style: TextStyle( fontSize: 20)),
                     SizedBox(width: 10),
                     Container(
                       // make rounded

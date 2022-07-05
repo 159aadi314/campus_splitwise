@@ -54,14 +54,14 @@ class _FriendsPageState extends State<FriendsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Friends"),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 35, 34, 34),
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: const Text("Friends"),
+      //   flexibleSpace: Container(
+      //     decoration: const BoxDecoration(
+      //       color: Color.fromARGB(255, 35, 34, 34),
+      //     ),
+      //   ),
+      // ),
 
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -96,30 +96,15 @@ class _FriendsPageState extends State<FriendsPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AddFriend()),
+              MaterialPageRoute(builder: (context) => const AddFriend()),
             );
           },
           // Add your onPressed code here!
         label: const Text('Add Friend '),
         icon: const Icon(Icons.person_add),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Activity',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.wallet),
-            label: 'Friends',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
-        ],
-      ),
+
+
     );
   }
 
@@ -137,7 +122,7 @@ class _FriendsPageState extends State<FriendsPage> {
           // increase size of this icon
           leading: 
            const Icon(Icons.person),
-          title: Text(friend['name'], style: TextStyle(fontSize: 19 )),
+          title: Text(friend['name'], style: const TextStyle(fontSize: 19 )),
           onTap: () {
             Navigator.push(
               context,
@@ -160,8 +145,8 @@ class _FriendsPageState extends State<FriendsPage> {
                   color: friend['IOU'] == 0
                       ? Colors.grey
                       : friend['IOU'] > 0
-                      ? Color.fromARGB(255, 112, 237, 116)
-                      : Color.fromARGB(255, 255, 107, 97),
+                      ? const Color.fromARGB(255, 112, 237, 116)
+                      : const Color.fromARGB(255, 255, 107, 97),
                 ),
               ),
               Text(
@@ -177,8 +162,8 @@ class _FriendsPageState extends State<FriendsPage> {
                   color: friend['IOU'] == 0
                       ? Colors.black
                       : friend['IOU'] > 0
-                      ? Color.fromARGB(255, 112, 237, 116)
-                      : Color.fromARGB(255, 255, 107, 97),
+                      ? const Color.fromARGB(255, 112, 237, 116)
+                      : const Color.fromARGB(255, 255, 107, 97),
                 ),
               )
             ],
@@ -187,5 +172,7 @@ class _FriendsPageState extends State<FriendsPage> {
       ),
     ),
   );
-
 }
+
+
+

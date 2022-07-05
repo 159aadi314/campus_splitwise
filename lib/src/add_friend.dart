@@ -72,9 +72,9 @@ class _AddFriendState extends State<AddFriend> {
               icon: Icon(Icons.check, color: Colors.black),
               // shift 10 unit left
               label: Text('Confirm', style: TextStyle(color: Colors.black)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.greenAccent,
-              ),
+              // style: ElevatedButton.styleFrom(
+              //   Color: MaterialStateProperty.all<Color>(Colors.greenAccent),
+              // ),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
