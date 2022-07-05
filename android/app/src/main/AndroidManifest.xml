@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.split_temp">
+    package="com.example.campus_splitwise">
    <application
-        android:label="split_temp"
+        android:label="campus_splitwise"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
