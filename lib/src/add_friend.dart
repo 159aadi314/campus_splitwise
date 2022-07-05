@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:email_validator/email_validator.dart';
 
 class AddFriend extends StatefulWidget {
   const AddFriend({Key? key}) : super(key: key);
@@ -58,6 +57,7 @@ class _AddFriendState extends State<AddFriend> {
                             ),
                           ),
                           autofocus: true,
+                          validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
                         ),
                       ),
                     ],
@@ -72,9 +72,9 @@ class _AddFriendState extends State<AddFriend> {
               icon: Icon(Icons.check, color: Colors.black),
               // shift 10 unit left
               label: Text('Confirm', style: TextStyle(color: Colors.black)),
-              // style: ElevatedButton.styleFrom(
-              //   Color: MaterialStateProperty.all<Color>(Colors.greenAccent),
-              // ),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.greenAccent,
+              ),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
