@@ -2,7 +2,7 @@ import 'package:campus_splitwise/src/account_page.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/friends.dart';
 import 'package:campus_splitwise/src/activity_page.dart';
-
+import 'package:campus_splitwise/src/group_page.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key? key}) : super(key: key);
@@ -18,8 +18,9 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
-  String _title = 'Recent Activity';
+  String _title = 'Your Groups';
   final List<Widget> _screens = [
+    const GroupsPage(),
     const ActivityPage(),
     const FriendsPage(),
     const AccountPage(),
@@ -44,6 +45,10 @@ class _MainPageState extends State<MainPage> {
         currentIndex: _currentIndex,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Groups',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Activity',
           ),
@@ -60,11 +65,13 @@ class _MainPageState extends State<MainPage> {
           setState(() {
             _currentIndex = index;
             switch(index) {
-              case 0: { _title = 'Recent Activity'; }
+              case 0: { _title = 'Your Groups'; }
               break;
-              case 1: { _title = 'Your Friends'; }
+              case 1: { _title = 'Recent Activity'; }
               break;
-              case 2: { _title = 'Your Profile'; }
+              case 2: { _title = 'Your Friends'; }
+              break;
+              case 3: { _title = 'Your Profile'; }
               break;
             }
           }
