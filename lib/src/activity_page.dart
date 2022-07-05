@@ -46,36 +46,33 @@ class _ActivityPageState extends State<ActivityPage> {
   }
 }
 
-Widget buildBox(Map<String,dynamic> activity) => Hero(
-  tag: 'activity-${activity['id']}',
-  child: SizedBox(
-    height: 90,
-    child: Card(
-      key: ValueKey(activity["id"]),
-      elevation: 2,
+Widget buildBox(Map<String,dynamic> activity) => SizedBox(
+  height: 90,
+  child: Card(
+    key: ValueKey(activity["id"]),
+    elevation: 2,
 
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        visualDensity: VisualDensity.comfortable,
-        // increase size of this icon
-        leading:
-        const Icon(Icons.person),
-        title: Text('${activity['sender']} paid ${activity['amount']} Rs to ${activity['receiver']}', style: TextStyle(fontSize: 19 )),
-        onTap: () {},
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Text(
-              '${activity['time']}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontFamily: 'Roboto',
-                color: Colors.grey,
-              ),
+    margin: const EdgeInsets.symmetric(vertical: 10),
+    child: ListTile(
+      visualDensity: VisualDensity.comfortable,
+      // increase size of this icon
+      leading:
+      const Icon(Icons.person),
+      title: Text('${activity['sender']} paid ${activity['amount']} Rs to ${activity['receiver']}', style: TextStyle(fontSize: 19 )),
+      onTap: () {},
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            '${activity['time']}',
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Roboto',
+              color: Colors.grey,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   ),

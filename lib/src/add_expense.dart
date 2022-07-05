@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:email_validator/email_validator.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({Key? key, required this.friend}) : super(key: key);
@@ -53,7 +54,7 @@ class _AddExpenseState extends State<AddExpense> {
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              
+
               children:<Widget> [
                 Container(
                   margin: EdgeInsets.only(left: 10),
@@ -164,7 +165,7 @@ class _AddExpenseState extends State<AddExpense> {
               ],
             ),
           ),
-          ] 
+          ]
         ),
       ),
     );
