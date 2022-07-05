@@ -1,6 +1,6 @@
 {
-    "name": "campus_splitwise",
-    "short_name": "campus_splitwise",
+    "name": "split_temp",
+    "short_name": "split_temp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
