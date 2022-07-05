@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "campus_splitwise" "\0"
+            VALUE "FileDescription", "split_temp" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "campus_splitwise" "\0"
+            VALUE "InternalName", "split_temp" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "campus_splitwise.exe" "\0"
-            VALUE "ProductName", "campus_splitwise" "\0"
+            VALUE "OriginalFilename", "split_temp.exe" "\0"
+            VALUE "ProductName", "split_temp" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
