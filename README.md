@@ -1,4 +1,4 @@
-# campus_splitwise
+# split_temp
 
 A new Flutter project.
 
