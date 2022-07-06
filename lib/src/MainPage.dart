@@ -2,7 +2,7 @@ import 'package:campus_splitwise/src/account_page.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/friends/friends.dart';
 import 'package:campus_splitwise/src/activity_page.dart';
-import 'package:campus_splitwise/src/group_page.dart';
+import 'package:campus_splitwise/src/groups/groups_home_page.dart';
 
 class MainPage extends StatefulWidget {
   final String uid;

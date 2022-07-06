@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_addfriends.dart';
 
+import 'group_page.dart';
+
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
 
@@ -9,7 +11,7 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  final List<Map<String,dynamic>> _allgroups = List.generate(20, (index) {
+  final List<Map<String,dynamic>> _allgroups = List.generate(10, (index) {
     return {
       'id': '$index',
       'name': 'Group ${index + 1}',
@@ -64,7 +66,13 @@ class _GroupsPageState extends State<GroupsPage> {
         padding: const EdgeInsets.all(10),
         child:
         Column(
-          children: [
+          children: 
+          _allgroups.isEmpty ? 
+          [
+            const SizedBox(height: 20),
+            Center(child:const Text('Create a group to start', style: TextStyle(fontSize: 24))),
+          ] :
+          [
             TextField(
               onChanged: (value) => _runFilter(value),
               decoration: const InputDecoration(
@@ -74,7 +82,9 @@ class _GroupsPageState extends State<GroupsPage> {
               height: 20,
             ),
             Expanded(
-              child: _foundGroups.isNotEmpty
+              child: 
+              
+              _foundGroups.isNotEmpty
                   ? ListView.builder(
                 itemCount: _foundGroups.length,
                 itemBuilder: (context, index) =>
@@ -120,7 +130,13 @@ class _GroupsPageState extends State<GroupsPage> {
           visualDensity: VisualDensity.comfortable,
           // increase size of this icon
           leading:
-          const Icon(Icons.group),
+            const Icon(Icons.group),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Group(group: group)),
+            );
+          },
           title: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,

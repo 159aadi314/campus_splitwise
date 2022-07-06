@@ -1,6 +1,6 @@
 # Campus_Splitwise
 
-App to handle group expenses. Inspired from Splitwise.
+App to handle group expenses . Inspired from Splitwise.
 
 # Table of contents
 
