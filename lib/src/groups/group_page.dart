@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'add_contribution.dart';
+
 class Group extends StatefulWidget {
   const Group({Key? key, required this.group}) : super(key: key);
   final Map<String, dynamic> group;
@@ -41,7 +43,6 @@ class _GroupState extends State<Group> {
 
     // CONNECTED USERS --------------
     mapping['connected_users'] = cnu;
-    print(mapping.toString());
   }
 
   static const headingStyle = TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
@@ -88,6 +89,22 @@ class _GroupState extends State<Group> {
             ],
           ),
         ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AddContribution(
+                  group: group,
+                ),
+            )
+          );
+        },
+        // Add your onPressed code here!
+        label: const Text('Add Contribution'),
+        icon: const Icon(Icons.person_add),
+      ),
       ),
     );
   }
