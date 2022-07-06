@@ -115,7 +115,7 @@ class _AddGroupPage extends State<AddGroupPage> {
           },
           // Add your onPressed code here!
     
-          child: const Icon(Icons.send),
+          child: const Icon(Icons.keyboard_arrow_right_rounded, size: 40 ),
         ),
     
     
