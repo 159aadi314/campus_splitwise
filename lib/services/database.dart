@@ -47,6 +47,7 @@ class DatabaseService {
     });
   }
 
+
   Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<dynamic, dynamic>;
