@@ -13,46 +13,59 @@ class GroupsPage extends StatefulWidget {
 
 class _GroupsPageState extends State<GroupsPage> {
   String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-  List<Map<String, dynamic>> _allgroups = [];
+  Map<dynamic, dynamic> _allgroups = {};
   bool loading = true;
   List<Map<String, dynamic>> _foundGroups = [];
+
+  List<Map<String, dynamic>> mapToList(Map<dynamic, dynamic> map) {
+    List<Map<String, dynamic>> groups = [];
+    map.forEach((key, value) { 
+      if(value !=null){
+        groups.add({
+          'id': key,
+          'name': value.toString(),
+        });
+      }
+    });
+    return groups;
+  }
 
   @override
   initState() {
     // at the beginning, all users are shown
-    _foundGroups = _allgroups;
+    _foundGroups = mapToList(_allgroups);
     super.initState();
   }
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    List<Map<String, dynamic>> results = [];
+    Map<dynamic, dynamic> results = {};
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
       results = _allgroups;
     } else {
-      results = _allgroups
-          .where((user) =>
-              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
+      results = _allgroups;
+      results.removeWhere((key, value) => !value.toString().toLowerCase().contains(enteredKeyword.toLowerCase()));
       // we use the toLowerCase() method to make it case-insensitive
     }
 
     // Refresh the UI
     setState(() {
-      _foundGroups = results;
+      _foundGroups = mapToList(results);
     });
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return FutureBuilder<Map<dynamic, dynamic>>(
         future: DatabaseService().getGroupsOfAUser(uid),
         builder: ((BuildContext context,
-            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+            AsyncSnapshot<Map<dynamic, dynamic>> snapshot) {
           if (snapshot.connectionState != ConnectionState.waiting) {
             return buildGroupPage(snapshot.data);
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -60,13 +73,8 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget buildGroupPage(dynamic data) {
-    if (data != null) {
-      setState(() {
-        _allgroups = data;
-        _foundGroups = data;
-      });
-    }
-
+    _allgroups = data;
+    _foundGroups = mapToList(data);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10),
