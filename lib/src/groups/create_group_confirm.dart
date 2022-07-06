@@ -1,3 +1,6 @@
+import 'package:campus_splitwise/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class CreateGroup extends StatefulWidget {
@@ -9,11 +12,15 @@ class CreateGroup extends StatefulWidget {
 
 class _CreateGroup extends State<CreateGroup> {
   final _formKey = GlobalKey<FormState>();
+  final DatabaseService db = DatabaseService();
+  List<String> lst = [];
   String people = "Members: ";
   @override
   void initState() {
     super.initState();
+    lst.add(FirebaseAuth.instance.currentUser!.uid);
     widget.groupUsers.forEach((key, value) {
+      lst.add(key);
       people = people + value;
       people = "$people, ";
     });
@@ -30,7 +37,9 @@ class _CreateGroup extends State<CreateGroup> {
             // shift 10 unit left
             padding: EdgeInsets.only(right: 10),
             onPressed: () {
-              if (_formKey.currentState!.validate()) {}
+              if (_formKey.currentState!.validate()) {
+                db.CreateGroup(lst);
+              }
             },
           ),
         ],
