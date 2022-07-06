@@ -10,7 +10,7 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  final List<Map<String,dynamic>> _allfriends = List.generate(20, (index) {
+  final List<Map<String,dynamic>> _allfriends = List.generate(10, (index) {
     return {
       'id': '$index',
       'name': 'Friend ${index + 1}',
@@ -58,7 +58,13 @@ class _FriendsPageState extends State<FriendsPage> {
         padding: const EdgeInsets.all(10),
         child:
         Column(
-          children: [
+          children: 
+          _allfriends.isEmpty ?
+          <Widget>[
+            SizedBox(height: 20),
+            Center(child: Text('Add a friend to start', style: TextStyle(fontSize: 24))),
+          ] :
+          [
             TextField(
               onChanged: (value) => _runFilter(value),
               decoration: const InputDecoration(
