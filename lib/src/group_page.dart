@@ -9,12 +9,14 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  final List<Map<String, dynamic>> _allgroups = List.generate(20, (index) {
+  final List<Map<String,dynamic>> _allgroups = List.generate(20, (index) {
     return {
       'id': '$index',
       'name': 'Group ${index + 1}',
       'description': 'default group',
-      'status': index % 2 == 1 ? 'settled' : 'not settled',
+      'status': index % 2 == 1
+          ? 'settled'
+          : 'not settled',
     };
   });
 
@@ -35,7 +37,7 @@ class _GroupsPageState extends State<GroupsPage> {
     } else {
       results = _allgroups
           .where((user) =>
-              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -60,7 +62,8 @@ class _GroupsPageState extends State<GroupsPage> {
       // ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(
+        child:
+        Column(
           children: [
             TextField(
               onChanged: (value) => _runFilter(value),
@@ -73,15 +76,16 @@ class _GroupsPageState extends State<GroupsPage> {
             Expanded(
               child: _foundGroups.isNotEmpty
                   ? ListView.builder(
-                      itemCount: _foundGroups.length,
-                      itemBuilder: (context, index) =>
-                          buildBox(_foundGroups[index]),
-                    )
+                itemCount: _foundGroups.length,
+                itemBuilder: (context, index) =>
+                    buildBox(_foundGroups[index]),
+              )
                   : const Text(
-                      'No results found',
-                      style: TextStyle(fontSize: 24),
-                    ),
+                'No results found',
+                style: TextStyle(fontSize: 24),
+              ),
             ),
+
           ],
         ),
       ),
@@ -98,41 +102,53 @@ class _GroupsPageState extends State<GroupsPage> {
         label: const Text('Create Group'),
         icon: const Icon(Icons.group_add),
       ),
+
+
     );
   }
 
-  Widget buildBox(Map<String, dynamic> group) => Hero(
-        tag: 'group-${group['id']}',
-        child: SizedBox(
-          height: 90,
-          child: Card(
-            key: ValueKey(group["id"]),
-            elevation: 2,
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            child: ListTile(
-              visualDensity: VisualDensity.comfortable,
-              // increase size of this icon
-              leading: const Icon(Icons.group),
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(height: 5),
-                  Text('${group['name']}', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  Text(
-                    '${group['description']}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Roboto',
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+  Widget buildBox(Map<String,dynamic> group) => Hero(
+    tag: 'group-${group['id']}',
+    child: SizedBox(
+      height: 90,
+      child: Card(
+        key: ValueKey(group["id"]),
+        elevation: 2,
+
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        child: ListTile(
+          visualDensity: VisualDensity.comfortable,
+          // increase size of this icon
+          leading:
+          const Icon(Icons.group),
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: 5),
+              Text(
+                  '${group['name']}',
+                  style: TextStyle(fontSize: 18 )
               ),
-              trailing: Text('${group['status']}'),
-            ),
+              SizedBox(height: 10),
+              Text(
+                '${group['description']}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Roboto',
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          trailing: Text(
+            '${group['status']}'
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
+
+
+

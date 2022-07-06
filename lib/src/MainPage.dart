@@ -5,8 +5,7 @@ import 'package:campus_splitwise/src/activity_page.dart';
 import 'package:campus_splitwise/src/group_page.dart';
 
 class MainPage extends StatefulWidget {
-  final String uid;
-  MainPage({required this.uid});
+  MainPage({Key? key}) : super(key: key);
   final String title = 's';
   final screens = [
     const ActivityPage(),
