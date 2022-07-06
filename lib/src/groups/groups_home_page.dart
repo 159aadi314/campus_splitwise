@@ -1,10 +1,8 @@
 import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_addfriends.dart';
-import 'package:campus_splitwise/services/auth.dart';
 import 'group_page.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -14,14 +12,14 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  final uid = "6Ln7LTv1w1Sw8SYWqDcnI81Ea8B3";
+  String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
   List<Map<String, dynamic>> _allgroups = [];
+  bool loading = true;
   List<Map<String, dynamic>> _foundGroups = [];
 
   @override
   initState() {
     // at the beginning, all users are shown
-    // _allgroups = await DatabaseService().getGroupsOfAUser(uid);
     _foundGroups = _allgroups;
     super.initState();
   }
@@ -49,6 +47,26 @@ class _GroupsPageState extends State<GroupsPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: DatabaseService().getGroupsOfAUser(uid),
+        builder: ((BuildContext context,
+            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            return buildGroupPage(snapshot.data);
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        }));
+  }
+
+  Widget buildGroupPage(dynamic data) {
+    if (data != null) {
+      setState(() {
+        _allgroups = data;
+        _foundGroups = data;
+      });
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10),

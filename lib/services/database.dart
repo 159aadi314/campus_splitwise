@@ -44,18 +44,19 @@ class DatabaseService {
     });
   }
 
-  Future<List<Map<String,dynamic>>> getGroupsOfAUser(String uid) async {
+  Future<List<Map<String, dynamic>>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<String, dynamic>;
     // convert data into a list with key and value fields
-    final List<Map<String,dynamic>> groupsList = [];
+    List<Map<String, dynamic>> groupsList = [];
     data.forEach((key, value) {
       if (value) {
-        Map<String,dynamic> group = {'id': key, 'name': data[key]};
+        Map<String, dynamic> group = {'id': key, 'name': data[key]};
         groupsList.add(group);
       }
     });
-
+    print(data);
+    print(groupsList);
     return groupsList;
   }
 }
