@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_splitwise/src/create_group.dart';
+import 'package:campus_splitwise/src/groups/create_group_addfriends.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -91,10 +91,11 @@ class _GroupsPageState extends State<GroupsPage> {
       ),
 
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'createGroup',
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CreateGroup()),
+            MaterialPageRoute(builder: (context) => const AddGroupPage()),
           );
         },
         // Add your onPressed code here!

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:campus_splitwise/src/friends.dart';
+import 'package:campus_splitwise/src/friends/friends.dart';
 
 class ActivityPage extends StatefulWidget {
   const ActivityPage({Key? key}) : super(key: key);

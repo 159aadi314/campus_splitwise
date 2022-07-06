@@ -13,8 +13,11 @@ migrate_working_dir/
 
 # Firebase
 /lib/firebase_options.dart
-/android/app/google-services.json
+# API key stuff
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
 
+/android/app/google-services.json
 # IntelliJ related
 *.iml
 *.ipr
@@ -113,7 +116,3 @@ coverage/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-
-# API key stuff
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
