@@ -1,7 +1,10 @@
+import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_addfriends.dart';
-
+import 'package:campus_splitwise/services/auth.dart';
 import 'group_page.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GroupsPage extends StatefulWidget {
   const GroupsPage({Key? key}) : super(key: key);
@@ -11,21 +14,14 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  final List<Map<String,dynamic>> _allgroups = List.generate(10, (index) {
-    return {
-      'id': '$index',
-      'name': 'Group ${index + 1}',
-      'description': 'default group',
-      'status': index % 2 == 1
-          ? 'settled'
-          : 'not settled',
-    };
-  });
-
+  final uid = "abc";
+  List<Map<String, dynamic>> _allgroups = [];
   List<Map<String, dynamic>> _foundGroups = [];
+
   @override
-  initState() {
+  initState() async {
     // at the beginning, all users are shown
+    _allgroups = await DatabaseService().getGroupsOfAUser(uid);
     _foundGroups = _allgroups;
     super.initState();
   }
@@ -39,7 +35,7 @@ class _GroupsPageState extends State<GroupsPage> {
     } else {
       results = _allgroups
           .where((user) =>
-          user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -54,52 +50,40 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("Friends"),
-      //   flexibleSpace: Container(
-      //     decoration: const BoxDecoration(
-      //       color: Color.fromARGB(255, 35, 34, 34),
-      //     ),
-      //   ),
-      // ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child:
-        Column(
-          children: 
-          _allgroups.isEmpty ? 
-          [
-            const SizedBox(height: 20),
-            Center(child:const Text('Create a group to start', style: TextStyle(fontSize: 24))),
-          ] :
-          [
-            TextField(
-              onChanged: (value) => _runFilter(value),
-              decoration: const InputDecoration(
-                  labelText: 'Search', suffixIcon: Icon(Icons.search)),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: 
-              
-              _foundGroups.isNotEmpty
-                  ? ListView.builder(
-                itemCount: _foundGroups.length,
-                itemBuilder: (context, index) =>
-                    buildBox(_foundGroups[index]),
-              )
-                  : const Text(
-                'No results found',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-
-          ],
+        child: Column(
+          children: _allgroups.isEmpty
+              ? [
+                  const SizedBox(height: 20),
+                  Center(
+                      child: const Text('Create a group to start',
+                          style: TextStyle(fontSize: 24))),
+                ]
+              : [
+                  TextField(
+                    onChanged: (value) => _runFilter(value),
+                    decoration: const InputDecoration(
+                        labelText: 'Search', suffixIcon: Icon(Icons.search)),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Expanded(
+                    child: _foundGroups.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: _foundGroups.length,
+                            itemBuilder: (context, index) =>
+                                buildBox(_foundGroups[index]),
+                          )
+                        : const Text(
+                            'No results found',
+                            style: TextStyle(fontSize: 24),
+                          ),
+                  ),
+                ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'createGroup',
         onPressed: () {
@@ -112,59 +96,38 @@ class _GroupsPageState extends State<GroupsPage> {
         label: const Text('Create Group'),
         icon: const Icon(Icons.group_add),
       ),
-
-
     );
   }
 
-  Widget buildBox(Map<String,dynamic> group) => Hero(
-    tag: 'group-${group['id']}',
-    child: SizedBox(
-      height: 90,
-      child: Card(
-        key: ValueKey(group["id"]),
-        elevation: 2,
-
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        child: ListTile(
-          visualDensity: VisualDensity.comfortable,
-          // increase size of this icon
-          leading:
-            const Icon(Icons.group),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Group(group: group)),
-            );
-          },
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 5),
-              Text(
-                  '${group['name']}',
-                  style: TextStyle(fontSize: 18 )
+  Widget buildBox(Map<String, dynamic> group) => Hero(
+        tag: 'group-${group['id']}',
+        child: SizedBox(
+          height: 90,
+          child: Card(
+            key: ValueKey(group["id"]),
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: ListTile(
+              visualDensity: VisualDensity.comfortable,
+              // increase size of this icon
+              leading: const Icon(Icons.group),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Group(group: group)),
+                );
+              },
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 13),
+                  Text('${group['name']}', style: TextStyle(fontSize: 20)),
+                  SizedBox(height: 20),
+                ],
               ),
-              SizedBox(height: 10),
-              Text(
-                '${group['description']}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Roboto',
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          trailing: Text(
-            '${group['status']}'
+            ),
           ),
         ),
-      ),
-    ),
-  );
+      );
 }
-
-
-
