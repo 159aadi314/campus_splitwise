@@ -31,7 +31,10 @@ class DatabaseService {
       });
     }
     for (var element in memberid) {
-      db.collection('user_grp').doc(element).update({newgroupRef.id: true});
+      db
+          .collection('user_grp')
+          .doc(element)
+          .set({newgroupRef.id: true}, SetOptions(merge: true));
     }
   }
 
