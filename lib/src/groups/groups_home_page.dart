@@ -14,14 +14,14 @@ class GroupsPage extends StatefulWidget {
 }
 
 class _GroupsPageState extends State<GroupsPage> {
-  final uid = "abc";
+  final uid = "6Ln7LTv1w1Sw8SYWqDcnI81Ea8B3";
   List<Map<String, dynamic>> _allgroups = [];
   List<Map<String, dynamic>> _foundGroups = [];
 
   @override
-  initState() async {
+  initState() {
     // at the beginning, all users are shown
-    _allgroups = await DatabaseService().getGroupsOfAUser(uid);
+    // _allgroups = await DatabaseService().getGroupsOfAUser(uid);
     _foundGroups = _allgroups;
     super.initState();
   }
