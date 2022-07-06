@@ -20,9 +20,8 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[50],
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Colors.greenAccent,
         elevation: 0.0,
         title: Text('Sign Up to split-wise'),
       ),
