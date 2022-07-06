@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:campus_splitwise/services/auth.dart';
+import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -20,7 +20,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown[50],
+      // backgroundColor: Colors.brown[50],
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
         elevation: 0.0,
@@ -36,6 +36,9 @@ class _SignInState extends State<SignIn> {
                     height: 50.0,
                   ),
                   TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                    ),
                     validator: (val) {
                       if (val == null) {
                         return "Enter an non null email";
@@ -53,13 +56,14 @@ class _SignInState extends State<SignIn> {
                     height: 20.0,
                   ),
                   TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                    ),
                     validator: (val) {
                       if (val == null) {
                         return "Enter a non null password of minimum 6 chars";
                       } else {
-                        return val.length < 6
-                            ? "Enter a password of minimum 6 chars"
-                            : null;
+                        return val.length < 6 ? "Incorrect Password" : null;
                       }
                     },
                     obscureText: true,
@@ -79,7 +83,7 @@ class _SignInState extends State<SignIn> {
                               .signInWithEmailAndPassword(email, password);
                           if (result == null) {
                             setState(() {
-                              error = 'Enter a valid email';
+                              error = 'Incorrect Email or Password';
                             });
                           } else {
                             Navigator.pop(context);
@@ -90,9 +94,13 @@ class _SignInState extends State<SignIn> {
                           }
                         }
                       },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.greenAccent),
+                      ),
                       child: Text(
                         'Sign In',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       )),
                   SizedBox(
                     height: 30,

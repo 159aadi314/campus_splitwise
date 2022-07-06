@@ -1,3 +1,4 @@
+import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -14,6 +15,7 @@ class Authenticate extends StatefulWidget {
 
 class _AuthenticateState extends State<Authenticate> {
   final AuthService _auth = AuthService();
+  final DatabaseService _db = DatabaseService();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -66,6 +68,8 @@ class _AuthenticateState extends State<Authenticate> {
               icon: FaIcon(FontAwesomeIcons.google),
               onPressed: () async {
                 dynamic result = await _auth.googleLogIn();
+                await _db.CreateUser(
+                    result.uid, result.email, result.password, result.name);
                 if (result == null) {
                   print("ERROR!!");
                 } else {
