@@ -46,6 +46,7 @@ class DatabaseService {
       'email': email,
       'name': name,
     });
+    FirebaseAuth.instance.currentUser?.updateDisplayName(name);
     db.collection('userEmail').doc(email).set({'uid' : uid});
     db.collection('userFriendsData').doc(uid).set({});
   }
@@ -96,6 +97,10 @@ class DatabaseService {
     return ans;
   }
 
+   Future<Map<String, dynamic>> getUsername(String? uid) async {
+    final user = await db.collection('users').doc(uid).get();
+    return await {'name':user.data()?['name']};
+  }
   Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<dynamic, dynamic>;

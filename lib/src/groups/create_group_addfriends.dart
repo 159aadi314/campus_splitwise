@@ -1,5 +1,8 @@
+import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_confirm.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage({Key? key}) : super(key: key);
 
@@ -8,13 +11,8 @@ class AddGroupPage extends StatefulWidget {
 }
 
 class _AddGroupPage extends State<AddGroupPage> {
-  final List<Map<String,dynamic>> _allfriends = List.generate(20, (index) {
-    return {
-      'id': '$index',
-      'name': 'Friend ${index + 1}',
-      'val': false
-    };
-  });
+  String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+  List<Map<String,dynamic>> _allfriends = [];
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> _foundUsers = [];
@@ -49,84 +47,99 @@ class _AddGroupPage extends State<AddGroupPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'createGroup',
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Add Members to the group"),
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 35, 34, 34),
-            ),
-          ),
-        ),
-    
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child:
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(5,5,5,5),
-                child: Form(
-                  key: _formKey,
-                  child: TextFormField(
-                    onChanged: (value) => _runFilter(value),
-                    decoration: const InputDecoration(
-                        labelText: 'Search friends', suffixIcon: Icon(Icons.search)),
-                    validator: (value){
-                      if(group_users.isEmpty)
-                        return "Please add at least 1 user";
-                      return null;
-                    },
-                  ),
-                ),
-    
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                child: _foundUsers.isNotEmpty
-                    ? ListView.builder(
-                  itemCount: _foundUsers.length,
-                  itemBuilder: (context, index) =>
-                      buildBox(_foundUsers[index]),
-                )
-                    : const Text(
-                  'No results found',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-            ],
-          ),
-        ),
-    
-        floatingActionButton: FloatingActionButton(
-          heroTag: null,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CreateGroup(groupUsers: group_users)),
-              );
-            }
-          },
-          // Add your onPressed code here!
-    
-          child: const Icon(Icons.keyboard_arrow_right_rounded, size: 40 ),
-        ),
-    
-    
-      ),
-    );
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseService().getFriendsOfAUser(uid),
+      builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
+        if (snapshot.connectionState != ConnectionState.waiting) {
+          return buildGroupsOnFriendsPage(snapshot.data);
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }});
   }
 
+  Widget buildGroupsOnFriendsPage(data){
+    _allfriends = data ?? {};
+    _allfriends.forEach((element) {element['val'] = false;});
+    _foundUsers = _allfriends;
+    return Hero(
+    tag: 'createGroup',
+    child: Scaffold(
+      appBar: AppBar(
+        title: const Text("Add Members to the group"),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 35, 34, 34),
+          ),
+        ),
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child:
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(5,5,5,5),
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  onChanged: (value) => _runFilter(value),
+                  decoration: const InputDecoration(
+                      labelText: 'Search friends', suffixIcon: Icon(Icons.search)),
+                  validator: (value){
+                    if(group_users.isEmpty)
+                      return "Please add at least 1 user";
+                    return null;
+                  },
+                ),
+              ),
+
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: _foundUsers.isNotEmpty
+                  ? ListView.builder(
+                itemCount: _foundUsers.length,
+                itemBuilder: (context, index) =>
+                    buildBox(_foundUsers[index]),
+              )
+                  : const Text(
+                'No results found',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CreateGroup(groupUsers: group_users)),
+            );
+          }
+        },
+        // Add your onPressed code here!
+
+        child: const Icon(Icons.keyboard_arrow_right_rounded, size: 40 ),
+      ),
+
+
+    ),
+    );
+  }
   Widget buildBox(Map<String,dynamic> friend) => Padding(
     padding: const EdgeInsets.fromLTRB(4,1,4,1),
     child: Card(
-      key: ValueKey(friend["id"]),
+      key: ValueKey(friend['id']),
       elevation: 2,
       color: friend['val']?Color.fromARGB(255, 49, 102, 196):null,
       child: ListTile(
