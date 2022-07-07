@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseService {
   final db = FirebaseFirestore.instance;
+  final CollectionReference userFriendsData = FirebaseFirestore.instance.collection('userFriendsData');
+  final CollectionReference userEmail = FirebaseFirestore.instance.collection('userEmail');
 
   //  data is of the form amount: int, desc string?, paid_by: string
   Future addActivity(
@@ -36,14 +39,43 @@ class DatabaseService {
   }
 
   Future CreateUser(
-      String uid, String email, String password, String name) async {
+      String uid, String email, String name) async {
     db.collection('users').doc(uid).set({
       'email': email,
-      'password': password,
       'name': name,
     });
+    db.collection('userEmail').doc(email).set({'uid' : uid});
   }
 
+  Future addFriend(String email) async {
+    int flag = 0;
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+    return await db.collection('userEmail').doc(email).get().then((snapshot) {
+        if(snapshot.data()?.length != 0) {
+          final data = snapshot.data();
+          final friendId = data?['uid'];
+          if(friendId != null && friendId != userId){
+            userFriendsData.doc(userId).update({
+              '$friendId': 0,
+            });
+            userFriendsData.doc(friendId).update({
+              '$userId': 0,
+            });
+          }else{
+            if(friendId == userId){
+              return Future.error('same email');
+            }
+            else if(friendId == null){
+              return Future.error('invalid');
+            }
+          }
+        }
+    });
+  }
+  Stream<DocumentSnapshot> get friends {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    return userFriendsData.doc(userId).snapshots();
+  }
   Future<List<Map<String,dynamic>>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<String, dynamic>;

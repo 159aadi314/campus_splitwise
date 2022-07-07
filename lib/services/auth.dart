@@ -15,7 +15,7 @@ class AuthService {
       return null;
     }
 
-    return myUser(uid: user.uid);
+    return myUser(uid: user.uid, email: user.email, name: user.displayName);
   }
 
   Stream<myUser?> get user {

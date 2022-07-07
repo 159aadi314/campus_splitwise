@@ -9,6 +9,7 @@ class MainPage extends StatefulWidget {
   MainPage({required this.uid});
   final String title = 's';
   final screens = [
+    const GroupsPage(),
     const ActivityPage(),
     const FriendsPage(),
     const AccountPage(),

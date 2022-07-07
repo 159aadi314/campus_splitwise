@@ -1,3 +1,4 @@
+import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -9,8 +10,10 @@ class AddFriend extends StatefulWidget {
 }
 
 class _AddFriendState extends State<AddFriend> {
+  String email = '';
+  String error = '';
   final _formKey = GlobalKey<FormState>();
-
+  final DatabaseService _db = DatabaseService();
   // initial values of the friend as empty map
   @override
   void initState() {
@@ -58,6 +61,11 @@ class _AddFriendState extends State<AddFriend> {
                           ),
                           autofocus: true,
                           validator: (value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
                         ),
                       ),
                     ],
@@ -79,16 +87,35 @@ class _AddFriendState extends State<AddFriend> {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
+
+                     _db.addFriend(email).then((v) {
+                       setState(() {
+                       error = '';
+                      });
+                      print('as');
+                      Navigator.pop(context);
+                     }).catchError((e){
+                       if(e == 'invalid') {
+                         setState(() {
+                           error = 'User with this email does not exist';
+                         });
+                       }
+                       else if(e == 'same email'){
+                         setState(() {
+                           error = "You can't add yourself as friend!";
+                         });
+                       }
+                       print(error);
+                     });
+
+                  }
+                  //_formKey.currentState!.save();
                 }
-                if (_formKey.currentState!.validate()) {
-                  // _formKey.currentState!.save();
-                  Navigator.pop(context);
-                }
-              },
             ),
+            ),
+          Text(
+            error,
+            style: TextStyle(color: Colors.red, fontSize: 15),
           )
           ] 
         ),

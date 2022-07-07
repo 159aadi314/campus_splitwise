@@ -69,7 +69,7 @@ class _AuthenticateState extends State<Authenticate> {
               onPressed: () async {
                 dynamic result = await _auth.googleLogIn();
                 await _db.CreateUser(
-                    result.uid, result.email, result.password, result.name);
+                    result.uid, result.email, result.name);
                 if (result == null) {
                   print("ERROR!!");
                 } else {

@@ -113,7 +113,7 @@ class _RegisterState extends State<Register> {
                             Navigator.pop(context);
                             print(result.uid);
                             await _db.CreateUser(
-                                result.uid, email, password, name);
+                                result.uid, email, name);
                             setState(() {
                               error = '';
                             });

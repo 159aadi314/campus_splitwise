@@ -1,6 +1,10 @@
+import 'package:campus_splitwise/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/add_expense.dart';
 import 'package:campus_splitwise/src/friends/add_friend.dart';
+import 'package:campus_splitwise/services/database.dart';
+import 'package:provider/provider.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({Key? key}) : super(key: key);
@@ -10,7 +14,8 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  final List<Map<String,dynamic>> _allfriends = List.generate(10, (index) {
+  final List<Map<String,dynamic>> _allfriends =
+  List.generate(10, (index) {
     return {
       'id': '$index',
       'name': 'Friend ${index + 1}',
@@ -26,6 +31,7 @@ class _FriendsPageState extends State<FriendsPage> {
   @override
   initState() {
     // at the beginning, all users are shown
+
     _foundUsers = _allfriends;
     super.initState();
   }
@@ -54,56 +60,54 @@ class _FriendsPageState extends State<FriendsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child:
-        Column(
-          children: 
-          _allfriends.isEmpty ?
-          <Widget>[
-            SizedBox(height: 20),
-            Center(child: Text('Add a friend to start', style: TextStyle(fontSize: 24))),
-          ] :
-          [
-            TextField(
-              onChanged: (value) => _runFilter(value),
-              decoration: const InputDecoration(
-                  labelText: 'Search', suffixIcon: Icon(Icons.search)),
+          body: Padding(
+            padding: const EdgeInsets.all(10),
+            child:
+            Column(
+              children:
+              _allfriends.isEmpty ?
+              <Widget>[
+                SizedBox(height: 20),
+                Center(child: Text('Add a friend to start', style: TextStyle(fontSize: 24))),
+              ] :
+              [
+                TextField(
+                  onChanged: (value) => _runFilter(value),
+                  decoration: const InputDecoration(
+                      labelText: 'Search', suffixIcon: Icon(Icons.search)),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
+                  child: _foundUsers.isNotEmpty
+                      ? ListView.builder(
+                    itemCount: _foundUsers.length,
+                    itemBuilder: (context, index) =>
+                        buildBox(_foundUsers[index]),
+                  )
+                      : const Text(
+                    'No results found',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: _foundUsers.isNotEmpty
-                  ? ListView.builder(
-                itemCount: _foundUsers.length,
-                itemBuilder: (context, index) =>
-                    buildBox(_foundUsers[index]),
-              )
-                  : const Text(
-                'No results found',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'add-friend',
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddFriend()),
-          );
-        },
-        // Add your onPressed code here!
-        label: const Text('Add Friend '),
-        icon: const Icon(Icons.person_add),
-      ),
-
-
-    );
+          floatingActionButton: FloatingActionButton.extended(
+            heroTag: 'add-friend',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddFriend()),
+              );
+            },
+            // Add your onPressed code here!
+            label: const Text('Add Friend '),
+            icon: const Icon(Icons.person_add),
+          ),
+        );
   }
 
   Widget buildBox(Map<String,dynamic> friend) => Hero(
