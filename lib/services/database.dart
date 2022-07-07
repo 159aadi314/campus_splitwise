@@ -5,7 +5,6 @@ class DatabaseService {
   final db = FirebaseFirestore.instance;
   final CollectionReference userFriendsData = FirebaseFirestore.instance.collection('userFriendsData');
   final CollectionReference userEmail = FirebaseFirestore.instance.collection('userEmail');
-
   //  data is of the form amount: int, desc string?, paid_by: string
   Future addActivity(
       String paidBy, int amount, String? desc, String gid) async {
@@ -48,22 +47,33 @@ class DatabaseService {
       'name': name,
     });
     db.collection('userEmail').doc(email).set({'uid' : uid});
+    db.collection('userFriendsData').doc(uid).set({});
   }
 
 
   Future addFriend(String email) async {
-    int flag = 0;
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
-    return await db.collection('userEmail').doc(email).get().then((snapshot) {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    return await db.collection('userEmail').doc(email).get().then((snapshot) async {
         if(snapshot.data()?.length != 0) {
           final data = snapshot.data();
           final friendId = data?['uid'];
           if(friendId != null && friendId != userId){
-            userFriendsData.doc(userId).update({
-              '$friendId': 0,
-            });
+
+            // DocumentReference d = userFriendsData.doc(userId);
+            // d.get().then((snapshot){
+            //   if(snapshot.exists){
+            //     d.update('$friendId')
+            //   }else{
+            //     d.set({'$friendId' : 0});
+            //   }
+            // });
+            final p = await db.collection('users').doc(friendId).get();
+            String friendName = p.data()?['name'];
+            final q = await db.collection('users').doc(userId).get();
+            String userName = q.data()?['name'];
+            userFriendsData.doc(userId).update({'$friendId' : [0, friendName]});
             userFriendsData.doc(friendId).update({
-              '$userId': 0,
+              '$userId': [0, userName],
             });
           }else{
             if(friendId == userId){
@@ -76,14 +86,26 @@ class DatabaseService {
         }
     });
   }
-  Stream<DocumentSnapshot> get friends {
-    String? userId = FirebaseAuth.instance.currentUser?.uid;
-    return userFriendsData.doc(userId).snapshots();
-   }
+  Future<List<Map<String, dynamic>>> getFriendsOfAUser(String uid) async {
+    List<Map<String, dynamic>> ans = [];
+    final friends = await db.collection('userFriendsData').doc(uid).get();
+    final data = friends.data() as Map<String, dynamic>;
+    data.forEach((key, value) async {
+      ans.add({'id' : key, 'IOU' : value[0], 'name' : value[1]});
+    });
+    return ans;
+  }
 
   Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<dynamic, dynamic>;
     return data;
+  }
+
+  Future<void> addExpense(String uid, String friendId, String friendName, int friendIOU, String description, int amount) async{
+    final p = await db.collection('users').doc(uid).get();
+    String userName = p.data()?['name'];
+    await db.collection('userFriendsData').doc(uid).update({friendId : [friendIOU-amount, friendName]});
+    await db.collection('userFriendsData').doc(friendId).update({uid : [-friendIOU+amount, userName]});
   }
 }

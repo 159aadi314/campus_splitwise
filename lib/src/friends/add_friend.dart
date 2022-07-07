@@ -92,7 +92,6 @@ class _AddFriendState extends State<AddFriend> {
                        setState(() {
                        error = '';
                       });
-                      print('as');
                       Navigator.pop(context);
                      }).catchError((e){
                        if(e == 'invalid') {

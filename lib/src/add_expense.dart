@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:campus_splitwise/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({Key? key, required this.friend}) : super(key: key);
@@ -10,9 +12,12 @@ class AddExpense extends StatefulWidget {
 }
 
 class _AddExpenseState extends State<AddExpense> {
+  String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> friend = <String, dynamic>{};
-
+  final DatabaseService _db = DatabaseService();
+  String description = '';
+  int amount = 0;
   // initial values of the friend as empty map
   @override
   void initState() {
@@ -36,12 +41,7 @@ class _AddExpenseState extends State<AddExpense> {
                 if (_formKey.currentState!.validate()) {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
-                }
-                if (_formKey.currentState!.validate()) {
-                  // _formKey.currentState!.save();
+                  _db.addExpense(uid, friend['id'], friend['name'], friend['IOU'], description, amount);
                   Navigator.pop(context, friend);
                 }
               },
@@ -116,6 +116,11 @@ class _AddExpenseState extends State<AddExpense> {
                             ),
                           ),
                           autofocus: true,
+                          onChanged: (val){
+                            setState(() {
+                              description = val;
+                            });
+                          },
                         ),
                       ),
                     ],
@@ -155,6 +160,11 @@ class _AddExpenseState extends State<AddExpense> {
                               return 'Please enter a valid amount';
                             }
                             return null;
+                          },
+                          onChanged: (val){
+                            setState(() {
+                              amount =  int.parse(val);
+                            });
                           },
                         ),
                       ),

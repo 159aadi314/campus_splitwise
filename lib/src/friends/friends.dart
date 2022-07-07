@@ -5,6 +5,7 @@ import 'package:campus_splitwise/src/add_expense.dart';
 import 'package:campus_splitwise/src/friends/add_friend.dart';
 import 'package:campus_splitwise/services/database.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({Key? key}) : super(key: key);
@@ -14,24 +15,14 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  final List<Map<String,dynamic>> _allfriends =
-  List.generate(10, (index) {
-    return {
-      'id': '$index',
-      'name': 'Friend ${index + 1}',
-      'IOU': index % 3 == 1
-          ? 100
-          : index % 3 == 2
-          ? -100
-          : 0, // pos or neg
-    };
-  });
-
+  String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+  List<Map<String,dynamic>> _allfriends = [];
+  bool loading = true;
   List<Map<String, dynamic>> _foundUsers = [];
+
   @override
   initState() {
     // at the beginning, all users are shown
-
     _foundUsers = _allfriends;
     super.initState();
   }
@@ -59,57 +50,72 @@ class _FriendsPageState extends State<FriendsPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(10),
-            child:
-            Column(
-              children:
-              _allfriends.isEmpty ?
-              <Widget>[
-                SizedBox(height: 20),
-                Center(child: Text('Add a friend to start', style: TextStyle(fontSize: 24))),
-              ] :
-              [
-                TextField(
-                  onChanged: (value) => _runFilter(value),
-                  decoration: const InputDecoration(
-                      labelText: 'Search', suffixIcon: Icon(Icons.search)),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Expanded(
-                  child: _foundUsers.isNotEmpty
-                      ? ListView.builder(
-                    itemCount: _foundUsers.length,
-                    itemBuilder: (context, index) =>
-                        buildBox(_foundUsers[index]),
-                  )
-                      : const Text(
-                    'No results found',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          floatingActionButton: FloatingActionButton.extended(
-            heroTag: 'add-friend',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddFriend()),
-              );
-            },
-            // Add your onPressed code here!
-            label: const Text('Add Friend '),
-            icon: const Icon(Icons.person_add),
-          ),
-        );
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseService().getFriendsOfAUser(uid),
+      builder: ((BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.waiting) {
+          return buildFriendsPage(snapshot.data);
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+     }),);
   }
 
+  Widget buildFriendsPage(data){
+    _allfriends = data ?? {};
+    _foundUsers = _allfriends;
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child:
+        Column(
+          children:
+          _allfriends.isEmpty ?
+          <Widget>[
+            SizedBox(height: 20),
+            Center(child: Text('Add a friend to start', style: TextStyle(fontSize: 24))),
+          ] :
+          [
+            TextField(
+              onChanged: (value) => _runFilter(value),
+              decoration: const InputDecoration(
+                  labelText: 'Search', suffixIcon: Icon(Icons.search)),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: _foundUsers.isNotEmpty
+                  ? ListView.builder(
+                itemCount: _foundUsers.length,
+                itemBuilder: (context, index) =>
+                    buildBox(_foundUsers[index]),
+              )
+                  : const Text(
+                'No results found',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'add-friend',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddFriend()),
+          );
+        },
+        // Add your onPressed code here!
+        label: const Text('Add Friend '),
+        icon: const Icon(Icons.person_add),
+      ),
+    );
+  }
   Widget buildBox(Map<String,dynamic> friend) => Hero(
     tag: 'friend-${friend['id']}',
     child: SizedBox(
