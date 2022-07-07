@@ -36,7 +36,7 @@ class DatabaseService {
     db
         .collection('user_grp')
         .doc(userId)
-        .set({newgroupRef.id: true}, SetOptions(merge: true));
+        .set({newgroupRef.id: grpName}, SetOptions(merge: true));
     memberid.forEach((key, value) {
       temp1['name'] = value;
       temp1['contribution'] = 0;
@@ -44,7 +44,7 @@ class DatabaseService {
       db
           .collection('user_grp')
           .doc(key)
-          .set({newgroupRef.id: true}, SetOptions(merge: true));
+          .set({newgroupRef.id: grpName}, SetOptions(merge: true));
     });
     newgroupRef.set({
       'members': members,
@@ -57,12 +57,8 @@ class DatabaseService {
       'email': email,
       'name': name,
     });
-<<<<<<< HEAD
-    db.collection('userEmail').doc(email).set({'uid': uid});
-=======
     FirebaseAuth.instance.currentUser?.updateDisplayName(name);
-    db.collection('userEmail').doc(email).set({'uid' : uid});
->>>>>>> 9916f03e63169cab31f53debb8cced8dca902a2a
+    db.collection('userEmail').doc(email).set({'uid': uid});
     db.collection('userFriendsData').doc(uid).set({});
     db.collection('user_grp').doc(uid).set({});
   }
@@ -117,10 +113,11 @@ class DatabaseService {
     return ans;
   }
 
-   Future<Map<String, dynamic>> getUsername(String? uid) async {
+  Future<Map<String, dynamic>> getUsername(String? uid) async {
     final user = await db.collection('users').doc(uid).get();
-    return await {'name':user.data()?['name']};
+    return await {'name': user.data()?['name']};
   }
+
   Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<dynamic, dynamic>;

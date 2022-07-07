@@ -1,10 +1,7 @@
 import 'package:campus_splitwise/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_confirm.dart';
-<<<<<<< HEAD
-=======
 import 'package:firebase_auth/firebase_auth.dart';
->>>>>>> 9916f03e63169cab31f53debb8cced8dca902a2a
 
 class AddGroupPage extends StatefulWidget {
   const AddGroupPage({Key? key}) : super(key: key);
@@ -14,14 +11,9 @@ class AddGroupPage extends StatefulWidget {
 }
 
 class _AddGroupPage extends State<AddGroupPage> {
-<<<<<<< HEAD
-  final List<Map<String, dynamic>> _allfriends = List.generate(20, (index) {
-    return {'id': '$index', 'name': 'Friend ${index + 1}', 'val': false};
-  });
-=======
   String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-  List<Map<String,dynamic>> _allfriends = [];
->>>>>>> 9916f03e63169cab31f53debb8cced8dca902a2a
+  List<Map<String, dynamic>> _allfriends = [];
+  Map<String, dynamic> val = {};
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> _foundUsers = [];
@@ -58,32 +50,38 @@ class _AddGroupPage extends State<AddGroupPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: DatabaseService().getFriendsOfAUser(uid),
-      builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot){
-        if (snapshot.connectionState != ConnectionState.waiting) {
-          return buildGroupsOnFriendsPage(snapshot.data);
-        } else if (snapshot.hasError) {
-          return Text("Error: ${snapshot.error}");
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }});
+        future: DatabaseService().getFriendsOfAUser(uid),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            return buildGroupsOnFriendsPage(snapshot.data);
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        });
   }
 
-  Widget buildGroupsOnFriendsPage(data){
-    _allfriends = data ?? {};
-    _allfriends.forEach((element) {element['val'] = false;});
-    _foundUsers = _allfriends;
+  Widget buildGroupsOnFriendsPage(data) {
+    if (_allfriends.isEmpty) {
+      _allfriends = data ?? {};
+      _foundUsers = _allfriends;
+      _allfriends.forEach((element) {
+        val[element['id']] = false;
+      });
+    }
     return Hero(
-    tag: 'createGroup',
-    child: Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Members to the group"),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 35, 34, 34),
+      tag: 'createGroup',
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Add Members to the group"),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              color: Color.fromARGB(255, 35, 34, 34),
+            ),
           ),
         ),
-<<<<<<< HEAD
         body: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -137,79 +135,17 @@ class _AddGroupPage extends State<AddGroupPage> {
           // Add your onPressed code here!
 
           child: const Icon(Icons.keyboard_arrow_right_rounded, size: 40),
-=======
-      ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child:
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(5,5,5,5),
-              child: Form(
-                key: _formKey,
-                child: TextFormField(
-                  onChanged: (value) => _runFilter(value),
-                  decoration: const InputDecoration(
-                      labelText: 'Search friends', suffixIcon: Icon(Icons.search)),
-                  validator: (value){
-                    if(group_users.isEmpty)
-                      return "Please add at least 1 user";
-                    return null;
-                  },
-                ),
-              ),
-
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: _foundUsers.isNotEmpty
-                  ? ListView.builder(
-                itemCount: _foundUsers.length,
-                itemBuilder: (context, index) =>
-                    buildBox(_foundUsers[index]),
-              )
-                  : const Text(
-                'No results found',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-          ],
->>>>>>> 9916f03e63169cab31f53debb8cced8dca902a2a
         ),
       ),
-
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => CreateGroup(groupUsers: group_users)),
-            );
-          }
-        },
-        // Add your onPressed code here!
-
-        child: const Icon(Icons.keyboard_arrow_right_rounded, size: 40 ),
-      ),
-
-
-    ),
     );
   }
-<<<<<<< HEAD
 
   Widget buildBox(Map<String, dynamic> friend) => Padding(
         padding: const EdgeInsets.fromLTRB(4, 1, 4, 1),
         child: Card(
-          key: ValueKey(friend["id"]),
+          key: ValueKey(friend['id']),
           elevation: 2,
-          color: friend['val'] ? Color.fromARGB(255, 49, 102, 196) : null,
+          color: val[friend['id']] ? Color.fromARGB(255, 49, 102, 196) : null,
           child: ListTile(
             visualDensity: VisualDensity.comfortable,
             // increase size of this icon
@@ -219,42 +155,18 @@ class _AddGroupPage extends State<AddGroupPage> {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
             onTap: () {
-              setState(() => friend['val'] = !friend['val']);
-              if (friend['val'])
+              print(friend);
+              print(val);
+              setState(() => val[friend['id']] = !val[friend['id']]);
+              print(friend);
+              print(val);
+              if (val[friend['id']])
                 group_users[friend['id']] = friend['name'];
               else
                 group_users.remove(friend['id']);
-              // print(group_users);
+              print(group_users);
             },
           ),
         ),
       );
-=======
-  Widget buildBox(Map<String,dynamic> friend) => Padding(
-    padding: const EdgeInsets.fromLTRB(4,1,4,1),
-    child: Card(
-      key: ValueKey(friend['id']),
-      elevation: 2,
-      color: friend['val']?Color.fromARGB(255, 49, 102, 196):null,
-      child: ListTile(
-        visualDensity: VisualDensity.comfortable,
-        // increase size of this icon
-        contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
-        leading:
-        const Icon(Icons.person),
-        title: Text(friend['name'], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500 )),
-        onTap: () {
-          setState(()=>friend['val']=!friend['val']);
-          if(friend['val'])
-            group_users[friend['id']]=friend['name'];
-          else
-            group_users.remove(friend['id']);
-          // print(group_users);
-
-        },
-      ),
-    ),
-  );
-
->>>>>>> 9916f03e63169cab31f53debb8cced8dca902a2a
 }
