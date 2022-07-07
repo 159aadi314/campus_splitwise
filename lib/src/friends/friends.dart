@@ -1,28 +1,44 @@
 import 'package:campus_splitwise/services/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:campus_splitwise/src/add_expense.dart';
+import 'package:campus_splitwise/src/friends/add_expense.dart';
 import 'package:campus_splitwise/src/friends/add_friend.dart';
-import 'package:campus_splitwise/services/database.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class FriendsPage extends StatefulWidget {
+class FriendsPage extends StatelessWidget {
   const FriendsPage({Key? key}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: DatabaseService().getFriendsOfAUser(FirebaseAuth.instance.currentUser?.uid ?? ''),
+      builder: ((BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.waiting) {
+          return FriendsBuild(allfriends : snapshot.data ?? []);
+        } else if (snapshot.hasError) {
+          return Text("Error: ${snapshot.error}");
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+     }),);
+  }
+}
+
+class FriendsBuild extends StatefulWidget {
+  const FriendsBuild({Key? key, required this.allfriends}) : super(key: key);
+
+  final List<Map<String,dynamic>> allfriends;
   @override
   _FriendsPageState createState() => _FriendsPageState();
 }
 
-class _FriendsPageState extends State<FriendsPage> {
-  String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-  List<Map<String,dynamic>> _allfriends = [];
-  bool loading = true;
+class _FriendsPageState extends State<FriendsBuild> {
+  final List<Map<String,dynamic>> _allfriends = [];
   List<Map<String, dynamic>> _foundUsers = [];
 
   @override
   initState() {
     // at the beginning, all users are shown
+    _allfriends.addAll(widget.allfriends);
     _foundUsers = _allfriends;
     super.initState();
   }
@@ -50,22 +66,6 @@ class _FriendsPageState extends State<FriendsPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: DatabaseService().getFriendsOfAUser(uid),
-      builder: ((BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.waiting) {
-          return buildFriendsPage(snapshot.data);
-        } else if (snapshot.hasError) {
-          return Text("Error: ${snapshot.error}");
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-     }),);
-  }
-
-  Widget buildFriendsPage(data){
-    _allfriends = data ?? {};
-    _foundUsers = _allfriends;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10),

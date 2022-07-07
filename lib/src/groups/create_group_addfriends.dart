@@ -3,14 +3,37 @@ import 'package:flutter/material.dart';
 import 'package:campus_splitwise/src/groups/create_group_confirm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class AddGroupPage extends StatefulWidget {
+class AddGroupPage extends StatelessWidget {
   const AddGroupPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: DatabaseService().getFriendsOfAUser(FirebaseAuth.instance.currentUser?.uid ?? ''),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            return BuildPage(allfriends: snapshot.data ?? []);
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        });
+  }
+}
+
+
+class BuildPage extends StatefulWidget {
+  const BuildPage({Key? key, required this.allfriends}) : super(key: key);
+
+  final List<Map<String, dynamic>> allfriends;
 
   @override
   _AddGroupPage createState() => _AddGroupPage();
 }
 
-class _AddGroupPage extends State<AddGroupPage> {
+class _AddGroupPage extends State<BuildPage> {
   String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
   List<Map<String, dynamic>> _allfriends = [];
   Map<String, dynamic> val = {};
@@ -20,7 +43,10 @@ class _AddGroupPage extends State<AddGroupPage> {
   Map<String, dynamic> group_users = {};
   @override
   initState() {
-    // at the beginning, all users are shown
+    _allfriends.addAll(widget.allfriends);
+    _allfriends.forEach((element) {
+      val[element['id']] = false;
+    });
     _foundUsers = _allfriends;
     super.initState();
   }
@@ -49,28 +75,6 @@ class _AddGroupPage extends State<AddGroupPage> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-        future: DatabaseService().getFriendsOfAUser(uid),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-          if (snapshot.connectionState != ConnectionState.waiting) {
-            return buildGroupsOnFriendsPage(snapshot.data);
-          } else if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Widget buildGroupsOnFriendsPage(data) {
-    if (_allfriends.isEmpty) {
-      _allfriends = data ?? {};
-      _foundUsers = _allfriends;
-      _allfriends.forEach((element) {
-        val[element['id']] = false;
-      });
-    }
     return Hero(
       tag: 'createGroup',
       child: Scaffold(

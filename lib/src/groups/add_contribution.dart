@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:campus_splitwise/services/database.dart';
 
 class AddContribution extends StatefulWidget {
   const AddContribution({Key? key, required this.group}) : super(key: key);
@@ -19,11 +21,11 @@ class _AddContributionState extends State<AddContribution> {
     super.initState();
     group.addAll(widget.group);
   }
+  String desc = "";
+  int amount = 0;
 
   @override
   Widget build(BuildContext context) {
-    String desc = "";
-    int amount = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Contribution'),
@@ -37,14 +39,9 @@ class _AddContributionState extends State<AddContribution> {
                 // If the form is valid, display a snackbar. In the real world,
                 // you'd often call a server or save the information in a database.
                 _formKey.currentState!.save();
-                print(desc);
-                print(amount);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      animation: null, content: Text('Processing Data')),
-                );
                 Navigator.pop(context, group);
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                final uid = FirebaseAuth.instance.currentUser!.uid;
+                DatabaseService().addContribution(uid, group, amount);
               }
             },
           ),
@@ -130,7 +127,6 @@ class _AddContributionState extends State<AddContribution> {
                     Expanded(
                       flex: 6,
                       child: TextFormField(
-                        onChanged: (String value) { setState((){amount = int.tryParse(value) ?? 0;}); },
                         decoration: const InputDecoration(
                           hintText: 'Enter amount',
                           focusedBorder: UnderlineInputBorder(
@@ -150,6 +146,11 @@ class _AddContributionState extends State<AddContribution> {
                             return 'Please enter a valid amount';
                           }
                           return null;
+                        },
+                        onChanged: (val){
+                          setState(() {
+                            amount =  int.parse(val);
+                          });
                         },
                       ),
                     ),

@@ -39,10 +39,12 @@ class _AddExpenseState extends State<AddExpense> {
               padding: EdgeInsets.only(right: 10),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  _db.addExpense(uid, friend['id'], friend['name'], friend['IOU'], description, amount);
+                  // const snackBar = SnackBar(
+                  //   content: Text('Processing...'),
+                  //   animation: null,
+                  // );
                   Navigator.pop(context, friend);
+                  _db.addExpense(uid, friend['id'], friend['name'], friend['IOU'], description, amount);
                 }
               },
             ),

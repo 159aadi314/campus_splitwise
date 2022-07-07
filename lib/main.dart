@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:campus_splitwise/models/user.dart';
 import 'package:campus_splitwise/src/authenticate/register.dart';
 import 'package:campus_splitwise/src/authenticate/signin.dart';
 import 'package:campus_splitwise/src/wrapper.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:campus_splitwise/services/auth.dart';
+
+// ...
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

@@ -21,24 +21,25 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
         child: Column(
           children: [
             Center(
-              child: Text(username as String),
+              child: 
+              Text(username as String, style: TextStyle(fontSize: 24)),
             ),
-            Row(
-              children: [
-                const Text('Email: '),
-                Text(email as String),
-              ],
-            ),
+            SizedBox(height: 20),
             Center(
-              child: TextButton(
+              child: 
+              Text('Email: $email', style: TextStyle(fontSize: 24)),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
                 onPressed: () async {
                   await _auth.signOut();
                 },
-                child: const Text('Logout', style: TextStyle(backgroundColor: Colors.red),),
+                child: const Text('Logout', style: TextStyle(fontSize: 24)),
               ),
             )
           ],

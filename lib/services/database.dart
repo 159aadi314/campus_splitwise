@@ -1,3 +1,4 @@
+import 'package:campus_splitwise/src/groups/compute_mapping.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -30,17 +31,19 @@ class DatabaseService {
     String userId = FirebaseAuth.instance.currentUser!.uid;
     final q = await db.collection('users').doc(userId).get();
     String userName = q.data()?['name'];
-    temp1['name'] = userName;
-    temp1['contribution'] = 0;
-    members[userId] = temp1;
+    members[userId] = {
+      'name': userName,
+      'contribution': 0,
+    };
     db
         .collection('user_grp')
         .doc(userId)
         .set({newgroupRef.id: grpName}, SetOptions(merge: true));
     memberid.forEach((key, value) {
-      temp1['name'] = value;
-      temp1['contribution'] = 0;
-      members[key] = temp1;
+      members[key] = {
+        'name': value,
+        'contribution': 0,
+      };
       db
           .collection('user_grp')
           .doc(key)
@@ -50,6 +53,8 @@ class DatabaseService {
       'members': members,
       'name': grpName,
     });
+    final newgrpTRef =
+        db.collection('grp_t').doc(newgroupRef.id).set({'t': {}});
   }
 
   Future CreateUser(String uid, String email, String name) async {
@@ -118,10 +123,56 @@ class DatabaseService {
     return await {'name': user.data()?['name']};
   }
 
-  Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
+  Future<List<Map<String, dynamic>>> getGroupsOfAUser(String uid) async {
+    List<Map<String, dynamic>> ans = [];
     final groups = await db.collection('user_grp').doc(uid).get();
     final data = groups.data() as Map<dynamic, dynamic>;
-    return data;
+    data.forEach((key, value) async {
+      ans.add({'id': key, 'name': value.toString()});
+    });
+    return ans;
+  }
+
+  Future<List<Map<String, dynamic>>> getUsersOfAGroup(String gid) async {
+    List<Map<String, dynamic>> ans = [];
+    final groups = await db.collection('groups').doc(gid).get();
+    final data = groups.data() as Map<dynamic, dynamic>;
+    data['members']?.forEach((key, value) async {
+      ans.add({
+        'uid': key,
+        'name': value['name'].toString(),
+        'contribution': value['contribution']
+      });
+    });
+    return ans;
+  }
+
+  Future<Map<String, dynamic>> getTsOfAGroup(String gid, String uid) async {
+    List<Map<String, dynamic>> ans = [];
+    final groups = await db.collection('grp_t').doc(gid).get();
+    final myNameRef = await getUsername(uid);
+    final myName = myNameRef['name'] as String;
+    final data = groups.data() as Map<dynamic, dynamic>;
+    bool getBack = false;
+    data['t']?.forEach((key, value) async {
+      if (value['getter'] == myName) {
+        getBack = true;
+        ans.add({
+          'friend_name': value['giver'],
+          'amount': value['amount'],
+        });
+      } else if (value['giver'] == myName) {
+        ans.add({
+          'friend_name': value['getter'],
+          'amount': value['amount'],
+        });
+      }
+    });
+    final Map<String, dynamic> mapping = {
+      'connected_users': ans,
+      "get_back": getBack,
+    };
+    return mapping;
   }
 
   Future<void> addExpense(String uid, String friendId, String friendName,
@@ -133,6 +184,27 @@ class DatabaseService {
     });
     await db.collection('userFriendsData').doc(friendId).update({
       uid: [-friendIOU + amount, userName]
+    });
+  }
+
+  Future<void> addContribution(
+      String uid, Map<dynamic, dynamic> group, int amount) async {
+    // update members list with contribution, then use the members list to add amount to the mapping
+    await db.collection('groups').doc(group['id']).update({
+      "members.$uid.contribution": FieldValue.increment(amount),
+    });
+    final groups = await db.collection('groups').doc(group['id']).get();
+    final data = groups.data() as Map<dynamic, dynamic>;
+    final members = data['members'] as Map<dynamic, dynamic>;
+    final ts = computeMapping(members);
+    // first delete existing value of the mapping, then add the new value
+    await db.collection('grp_t').doc(group['id']).update({
+      't': FieldValue.delete(),
+    });
+    ts.forEach((key, value) {
+      db.collection('grp_t').doc(group['id']).update({
+        't.$key': value,
+      });
     });
   }
 }
