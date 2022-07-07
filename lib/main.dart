@@ -17,7 +17,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -26,14 +25,11 @@ class MyApp extends StatelessWidget {
       initialData: null,
       child: MaterialApp(
         title: 'Campus Splitwise',
-        theme: ThemeData(
-            brightness: Brightness.dark
-        ),
+        theme: ThemeData(brightness: Brightness.dark),
         home: Wrapper(),
         debugShowCheckedModeBanner: false,
         onGenerateRoute: RouteMaker.generateRoute,
       ),
-
     );
   }
 }
@@ -50,6 +46,7 @@ class RouteMaker {
         return _errorRoute();
     }
   }
+
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(builder: (_) {
       return Scaffold(
@@ -63,8 +60,3 @@ class RouteMaker {
     });
   }
 }
-
-
-
-
-

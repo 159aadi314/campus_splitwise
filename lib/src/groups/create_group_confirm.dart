@@ -11,16 +11,14 @@ class CreateGroup extends StatefulWidget {
 }
 
 class _CreateGroup extends State<CreateGroup> {
+  String grpName = '';
   final _formKey = GlobalKey<FormState>();
   final DatabaseService db = DatabaseService();
-  List<String> lst = [];
   String people = "Members: ";
   @override
   void initState() {
     super.initState();
-    lst.add(FirebaseAuth.instance.currentUser!.uid);
     widget.groupUsers.forEach((key, value) {
-      lst.add(key);
       people = people + value;
       people = "$people, ";
     });
@@ -38,7 +36,9 @@ class _CreateGroup extends State<CreateGroup> {
             padding: EdgeInsets.only(right: 10),
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                db.CreateGroup(lst);
+                db.CreateGroup(widget.groupUsers, grpName);
+                Navigator.pop(context);
+                Navigator.pop(context);
               }
             },
           ),
@@ -70,6 +70,11 @@ class _CreateGroup extends State<CreateGroup> {
                         ),
                       ),
                     ),
+                    onChanged: (val) {
+                      setState(() {
+                        grpName = val;
+                      });
+                    },
                     autofocus: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
