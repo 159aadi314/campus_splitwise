@@ -19,8 +19,8 @@ class _GroupsPageState extends State<GroupsPage> {
 
   List<Map<String, dynamic>> mapToList(Map<dynamic, dynamic> map) {
     List<Map<String, dynamic>> groups = [];
-    map.forEach((key, value) { 
-      if(value !=null){
+    map.forEach((key, value) {
+      if (value != null) {
         groups.add({
           'id': key,
           'name': value.toString(),
@@ -45,7 +45,10 @@ class _GroupsPageState extends State<GroupsPage> {
       results = _allgroups;
     } else {
       results = _allgroups;
-      results.removeWhere((key, value) => !value.toString().toLowerCase().contains(enteredKeyword.toLowerCase()));
+      results.removeWhere((key, value) => !value
+          .toString()
+          .toLowerCase()
+          .contains(enteredKeyword.toLowerCase()));
       // we use the toLowerCase() method to make it case-insensitive
     }
 
@@ -73,8 +76,8 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget buildGroupPage(dynamic data) {
-    _allgroups = data;
-    _foundGroups = mapToList(data);
+    _allgroups = data ?? {};
+    _foundGroups = mapToList(_allgroups);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10),
