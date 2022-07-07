@@ -34,7 +34,10 @@ class DatabaseService {
       });
     }
     for (var element in memberid) {
-      db.collection('user_grp').doc(element).update({newgroupRef.id: true});
+      db
+          .collection('user_grp')
+          .doc(element)
+          .set({newgroupRef.id: true}, SetOptions(merge: true));
     }
   }
 
@@ -46,6 +49,7 @@ class DatabaseService {
     });
     db.collection('userEmail').doc(email).set({'uid' : uid});
   }
+
 
   Future addFriend(String email) async {
     int flag = 0;
@@ -75,19 +79,11 @@ class DatabaseService {
   Stream<DocumentSnapshot> get friends {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     return userFriendsData.doc(userId).snapshots();
-  }
-  Future<List<Map<String,dynamic>>> getGroupsOfAUser(String uid) async {
-    final groups = await db.collection('user_grp').doc(uid).get();
-    final data = groups.data() as Map<String, dynamic>;
-    // convert data into a list with key and value fields
-    final List<Map<String,dynamic>> groupsList = [];
-    data.forEach((key, value) {
-      if (value) {
-        Map<String,dynamic> group = {'id': key, 'name': data[key]};
-        groupsList.add(group);
-      }
-    });
+   }
 
-    return groupsList;
+  Future<Map<dynamic, dynamic>> getGroupsOfAUser(String uid) async {
+    final groups = await db.collection('user_grp').doc(uid).get();
+    final data = groups.data() as Map<dynamic, dynamic>;
+    return data;
   }
 }
